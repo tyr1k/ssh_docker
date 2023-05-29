@@ -1,0 +1,22 @@
+FROM ubuntu
+
+# Установка пакетов
+RUN apt update && apt install -y openssh-server nano
+
+# Установка пароля для пользователя root
+RUN echo 'root:test' | chpasswd
+
+# Изменение настройки PermitRootLogin в файле /etc/ssh/sshd_config
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+
+# Копирование скрипта entrypoint в контейнер
+COPY entrypoint.sh /entrypoint.sh
+
+# Открытие порта 22 для SSH
+EXPOSE 22
+
+# Запуск скрипта entrypoint при старте контейнера
+ENTRYPOINT ["/entrypoint.sh"]
+
+# Команда для запуска процесса tail в фоновом режиме
+CMD tail -f /dev/null
